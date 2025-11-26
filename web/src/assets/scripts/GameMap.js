@@ -1,5 +1,6 @@
 import { AcGameObject } from "./AcGameObject";
 import { Wall } from "./Wall";
+import { Snake } from "./Snake";
 export class GameMap extends AcGameObject{
     constructor(ctx,parent){
         super();
@@ -9,13 +10,18 @@ export class GameMap extends AcGameObject{
         this.L = 0;
 
         this.rows = 13;
-        this.cols = 13;
+        this.cols = 14;
 
         this.inner_walls_count = 20;
         this.walls = [];
+
+        this.snakes = [
+            new Snake({id: 0, color: "#4876EC", r: this.rows - 2, c: 1}, this),
+            new Snake({id: 1, color: "#F94848", r: 1, c: this.cols - 2}, this),
+        ]
     }
 
-    check_connectivity(g, sx, sy, tx, ty){
+    check_connectivity(g, sx, sy, tx, ty){ // 判断左下角和右上角是否连通
         if(sx == tx && sy == ty) return true;
         g[sx][sy] = true;
         
@@ -29,7 +35,7 @@ export class GameMap extends AcGameObject{
         return false;
     }
 
-    create_walls(){
+    create_walls(){ // 创建障碍物
         const g = [];
         for(let r = 0; r < this.rows; r ++){
             g[r] = [];
@@ -57,7 +63,7 @@ export class GameMap extends AcGameObject{
                     continue;
                 }
                 else{
-                    g[r][c] = g[c][r] = true; 
+                    g[r][c] = g[this.rows - r - 1][this.cols - c - 1] = true; 
                     break;
                 }
             }
@@ -77,14 +83,14 @@ export class GameMap extends AcGameObject{
     }
 
     start(){
-        for(let i = 0; i < 1000; i ++){
+        for(let i = 0; i < 1000; i ++){ // 重复创建1000次障碍物，直到合法
             if(this.create_walls()){
                 break;
             }
         }
     }
 
-    update_size(){
+    update_size(){ //算出地图的相对长宽
         this.L = Math.min(Math.trunc(this.parent.clientWidth/this.cols), Math.trunc(this.parent.clientHeight/this.rows));
         this.ctx.canvas.width = this.L * this.cols;
         this.ctx.canvas.height = this.L * this.rows;
@@ -95,7 +101,7 @@ export class GameMap extends AcGameObject{
         this.render();
     }
 
-    render(){
+    render(){ //创建地图
         const color_even = "#AAD751", color_odd = "#8eca18ff"; 
           for(let r = 0; r < this.rows; r ++){
             for(let c = 0; c < this.cols; c ++){
