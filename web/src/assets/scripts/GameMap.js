@@ -82,22 +82,56 @@ export class GameMap extends AcGameObject{
         return true;
     }
 
+    add_listening_events(){
+        this.ctx.canvas.focus();
+
+        const [snake0, snake1] = this.snakes;
+        this.ctx.canvas.addEventListener("keydown", e => {
+            if(e.key === 'w') snake0.set_direction(0);
+            else if(e.key === 'd') snake0.set_direction(1);
+            else if(e.key === 's') snake0.set_direction(2);
+            else if(e.key === 'a') snake0.set_direction(3);
+            else if(e.key === 'ArrowUp')snake1.set_direction(0);
+            else if(e.key == 'ArrowRight')snake1.set_direction(1);
+            else if(e.key == 'ArrowDown')snake1.set_direction(2);
+            else if(e.key == 'ArrowLeft')snake1.set_direction(3);
+        });
+    }
+
     start(){
         for(let i = 0; i < 1000; i ++){ // 重复创建1000次障碍物，直到合法
             if(this.create_walls()){
                 break;
             }
         }
-    }
 
+        this.add_listening_events();
+    }
     update_size(){ //算出地图的相对长宽
         this.L = Math.min(Math.trunc(this.parent.clientWidth/this.cols), Math.trunc(this.parent.clientHeight/this.rows));
         this.ctx.canvas.width = this.L * this.cols;
         this.ctx.canvas.height = this.L * this.rows;
     }
 
+    next_step(){
+        for(const snake of this.snakes){
+            snake.next_step();
+        }
+    }
+
+    check_ready(){
+        for(const snake of this.snakes){
+            if(snake.status !== "idle") return false;
+            if(snake.status === -1) return false;
+        }
+        return true;
+    }
+
     update(){
         this.update_size();
+        if(this.check_ready){
+            this.next_step();
+        }
         this.render();
     }
 
