@@ -41,5 +41,3 @@ public class CorsConfig implements Filter {
     public void destroy() {
     }
 }
-
-
