@@ -4,7 +4,7 @@ import RanKlistIndexView from '@/views/ranklist/RanKlistIndexView.vue'
 import RecordIndexView from '@/views/record/RecordIndexView.vue'
 import UserBotIndexView from '@/views/user/bot/UserBotIndexView.vue'
 import NotFound from '@/views/error/NotFound.vue'
-import UserSettingsVies from '@/views/user/bot/settings/UserSettingsVies.vue'
+import UserSettingsView from '@/views/user/bot/settings/UserSettingsView.vue'
 import UserAccountLoginView from '@/views/user/bot/account/UserAccountLoginView.vue'
 import UserAccountRegisterView from '@/views/user/bot/account/UserAccountRegisterView.vue'
 import store from '@/store/index.js'
@@ -43,7 +43,7 @@ const routes = [
   {
     path:"/user/settings/",
     name:"settings_index",
-    component: UserSettingsVies,
+    component: UserSettingsView,
     meta: { requiresAuth: true },
   },
     {

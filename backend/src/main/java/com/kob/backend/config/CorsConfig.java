@@ -1,43 +1,39 @@
 package com.kob.backend.config;
 
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.Ordered;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.CorsFilter;
 
-import javax.servlet.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.util.Arrays;
 
 @Configuration
-public class CorsConfig implements Filter {
-    @Override
-    public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain) throws IOException, ServletException {
-        HttpServletResponse response = (HttpServletResponse) res;
-        HttpServletRequest request = (HttpServletRequest) req;
+public class CorsConfig {
 
-        String origin = request.getHeader("Origin");
-        if(origin!=null) {
-            response.setHeader("Access-Control-Allow-Origin", origin);
-        }
+    @Bean
+    public FilterRegistrationBean<CorsFilter> corsFilterRegistrationBean() {
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        CorsConfiguration config = new CorsConfiguration();
 
-        String headers = request.getHeader("Access-Control-Request-Headers");
-        if(headers!=null) {
-            response.setHeader("Access-Control-Allow-Headers", headers);
-            response.setHeader("Access-Control-Expose-Headers", headers);
-        }
+        // 明确指定允许的前端地址，生产环境应替换为实际域名
+        config.setAllowedOrigins(Arrays.asList("http://localhost:8080"));
+        // 允许的方法
+        config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        // 允许的头部，建议明确指定所需头部，如"Authorization", "Content-Type"
+        config.setAllowedHeaders(Arrays.asList("*"));
+        // 允许携带凭证（如Cookie）
+        config.setAllowCredentials(true);
+        // 预检请求缓存时间
+        config.setMaxAge(3600L);
 
-        response.setHeader("Access-Control-Allow-Methods", "*");
-        response.setHeader("Access-Control-Max-Age", "3600");
-        response.setHeader("Access-Control-Allow-Credentials", "true");
+        source.registerCorsConfiguration("/**", config);
 
-        chain.doFilter(request, response);
-    }
-
-    @Override
-    public void init(FilterConfig filterConfig) {
-
-    }
-
-    @Override
-    public void destroy() {
+        FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(source));
+        // 关键！设置最高优先级，确保先于Spring Security的过滤器执行
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE);
+        return bean;
     }
 }
