@@ -2,11 +2,12 @@ import { AcGameObject } from "./AcGameObject";
 import { Wall } from "./Wall";
 import { Snake } from './Snake';
 export class GameMap extends AcGameObject{
-    constructor(ctx,parent){
+    constructor(ctx,parent, store){
         super();
 
         this.ctx = ctx;
         this.parent = parent;
+        this.store = store;
         this.L = 0;
 
         this.rows = 13;
@@ -37,42 +38,8 @@ export class GameMap extends AcGameObject{
     }
 
     create_walls(){ // 创建障碍物
-        const g = [];
-        for(let r = 0; r < this.rows; r ++){
-            g[r] = [];
-            for(let c = 0; c < this.cols; c ++){
-                g[r][c] = false;
-            }
-        }
-
-        for(let r = 0; r < this.rows; r ++){
-            g[r][0] = g[r][this.cols - 1] = true;
-        }
-
-        for(let c = 0; c < this.cols; c ++){
-            g[0][c] = g[this.rows - 1][c] = true;
-        }
-
-        for(let i = 0; i < this.inner_walls_count / 2; i ++){
-            for(let j = 0; j < 1000; j ++){
-                let r = parseInt(Math.random() * this.rows);
-                let c = parseInt(Math.random() * this.cols);
-                if(r == this.rows - 2 && c == 1 || r == 1 && c == this.cols - 2){
-                    continue;
-                }
-                if(g[r][c] || g[c][r]){
-                    continue;
-                }
-                else{
-                    g[r][c] = g[this.rows - r - 1][this.cols - c - 1] = true; 
-                    break;
-                }
-            }
-        }
-        const copy_g = JSON.parse(JSON.stringify(g));
-        if(!this.check_connectivity(copy_g, this.rows - 2, 1, 1, this.cols - 2)) 
-          return false;
-
+        const g = this.store.state.pk.Gamemap;
+        
         for(let r = 0; r < this.rows; r ++){
             for(let c = 0; c < this.cols; c ++){
                 if(g[r][c]){
@@ -100,12 +67,7 @@ export class GameMap extends AcGameObject{
     }
 
     start(){
-        for(let i = 0; i < 1000; i ++){ // 重复创建1000次障碍物，直到合法
-            if(this.create_walls()){
-                break;
-            }
-        }
-
+        this.create_walls();
         this.add_listening_events();
     }
     update_size(){ //算出地图的相对长宽
