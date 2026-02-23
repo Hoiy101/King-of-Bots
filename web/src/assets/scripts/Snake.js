@@ -16,7 +16,7 @@ export class Snake extends AcGameObject{
 
         this.speed = 5;
         this.direction = -1;
-        this.status = "idle";
+        this.status = "idle"; // idle表示静止，move表示正在移动，die表示死亡
 
         this.dr = [-1, 0, 1, 0];
         this.dc = [0, 1, 0, -1];
@@ -70,10 +70,6 @@ export class Snake extends AcGameObject{
             this.cells[i] = JSON.parse(JSON.stringify(this.cells[i - 1]));
 
         }
-
-        if(!this.gamemap.check_valid(this.next_cell)){
-            this.status = "die";
-        } 
     }
 
     update_move(){

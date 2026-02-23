@@ -9,7 +9,7 @@ export class GameMap extends AcGameObject{
         this.parent = parent;
         this.store = store;
         this.L = 0;
-
+ 
         this.rows = 13;
         this.cols = 14;
 
@@ -22,23 +22,9 @@ export class GameMap extends AcGameObject{
         ];
 
     }
-
-    check_connectivity(g, sx, sy, tx, ty){ // 判断左下角和右上角是否连通
-        if(sx == tx && sy == ty) return true;
-        g[sx][sy] = true;
-        
-        let dx = [-1, 0, 1, 0], dy = [0, 1, 0, -1];
-        for(let i = 0; i < 4; i ++){
-            let x = sx + dx[i], y = sy + dy[i];
-            if(!g[x][y] && this.check_connectivity(g, x, y, tx, ty)){
-                return true;
-            }
-        }
-        return false;
-    }
-
+    
     create_walls(){ // 创建障碍物
-        const g = this.store.state.pk.Gamemap;
+        const g = this.store.state.pk.gamemap;
         
         for(let r = 0; r < this.rows; r ++){
             for(let c = 0; c < this.cols; c ++){
@@ -52,17 +38,19 @@ export class GameMap extends AcGameObject{
 
     add_listening_events(){
         this.ctx.canvas.focus();
-
-        const [snake0, snake1] = this.snakes;
         this.ctx.canvas.addEventListener("keydown", e => { // 从键盘中读入方向，并且不会回头
-            if(e.key === 'w') snake0.set_direction(0);
-            else if(e.key === 'd') snake0.set_direction(1);
-            else if(e.key === 's') snake0.set_direction(2);
-            else if(e.key === 'a') snake0.set_direction(3);
-            else if(e.key === 'ArrowUp')snake1.set_direction(0);
-            else if(e.key == 'ArrowRight')snake1.set_direction(1);
-            else if(e.key == 'ArrowDown')snake1.set_direction(2);
-            else if(e.key == 'ArrowLeft')snake1.set_direction(3);
+            let d = -1;
+            if(e.key === 'w' || e.key === 'W') d = 0;
+            else if(e.key === 'd' || e.key === 'D') d = 1;
+            else if(e.key === 's' || e.key === 'S') d = 2;
+            else if(e.key === 'a' || e.key === 'A') d = 3;
+ 
+            if(d >= 0){
+                this.store.state.pk.socket.send(JSON.stringify({
+                    event: "move",
+                    direction: d,
+                }));
+            }
         });
     }
 
