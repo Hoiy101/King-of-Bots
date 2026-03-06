@@ -64,7 +64,8 @@ export default{
             }
             socket.onclose = () => {
                 console.log("WebSocket连接已关闭");
-                store.commit("updatestatus", "matching");  
+                store.commit("updatestatus", "matching"); 
+                store.commit("updateloser", "none");
             }
         }
         });
