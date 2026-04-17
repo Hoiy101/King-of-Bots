@@ -1,5 +1,6 @@
 package com.kob.backend.consumer.utils;
 
+import com.kob.backend.pojo.Bot;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,8 @@ public class Player {
     private Integer id;
     private Integer sx;
     private Integer sy;
+    private Integer BotId; // -1表示人工操作
+    private String BotCode;
     private List<Integer> steps;
 
     private  boolean check_tail_increasing(int step){

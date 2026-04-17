@@ -10,7 +10,8 @@
     <modules>
         <module>matchingsystem</module>
         <module>backend</module>
-        <module>backend</module>
+        <module>untitled</module>
+        <module>botrunningsystem</module>
     </modules>
     <packaging>pom</packaging>
     <properties>
