@@ -97,6 +97,12 @@
             <version>2.0.61</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-boot-starter</artifactId>
+            <version>3.5.2</version>
+        </dependency>
     </dependencies>
 
     <groupId>com.kob.backend</groupId>

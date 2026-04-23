@@ -37,21 +37,47 @@ export class GameMap extends AcGameObject{
     }
 
     add_listening_events(){
-        this.ctx.canvas.focus();
-        this.ctx.canvas.addEventListener("keydown", e => { // 从键盘中读入方向，并且不会回头
-            let d = -1;
-            if(e.key === 'w' || e.key === 'W') d = 0;
-            else if(e.key === 'd' || e.key === 'D') d = 1;
-            else if(e.key === 's' || e.key === 'S') d = 2;
-            else if(e.key === 'a' || e.key === 'A') d = 3;
- 
-            if(d >= 0){
-                this.store.state.pk.socket.send(JSON.stringify({
-                    event: "move",
-                    direction: d,
-                }));
-            }
-        });
+        if(this.store.state.record.is_record){
+            let k = 0;
+            const a_steps = this.store.state.record.a_steps;
+            const b_steps = this.store.state.record.b_steps;
+            const loser = this.store.state.record.record_loser;
+            const [snake0, snake1] = this.snakes;
+            const interval_id = setInterval(() => {
+                if(k >= a_steps.length - 1){
+                    if(loser === "all" || loser === "a"){
+                        snake0.status = "die";
+                    }
+                    if(loser === "all" || loser === "b"){
+                        snake1.status = "die";
+                    }
+                    clearInterval(interval_id);
+                }
+                else{
+                    snake0.set_direction(parseInt(a_steps[k]));
+                    snake1.set_direction(parseInt(b_steps[k]));
+                    k ++;
+                }
+            }, 300);
+        }
+        else{
+            this.ctx.canvas.focus();
+
+            this.ctx.canvas.addEventListener("keydown", e => { // 从键盘中读入方向，并且不会回头
+                let d = -1;
+                if(e.key === 'w' || e.key === 'W') d = 0;
+                else if(e.key === 'd' || e.key === 'D') d = 1;
+                else if(e.key === 's' || e.key === 'S') d = 2;
+                else if(e.key === 'a' || e.key === 'A') d = 3;
+    
+                if(d >= 0){
+                    this.store.state.pk.socket.send(JSON.stringify({
+                        event: "move",
+                        direction: d,
+                    }));
+                }
+            });
+        }
     }
 
     start(){

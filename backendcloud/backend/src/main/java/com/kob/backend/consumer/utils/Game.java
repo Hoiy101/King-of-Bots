@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.kob.backend.consumer.WebSocketServer;
 import com.kob.backend.pojo.Bot;
 import com.kob.backend.pojo.Record;
+import com.kob.backend.pojo.User;
 import lombok.Data;
 import lombok.Getter;
 import org.springframework.util.LinkedMultiValueMap;
@@ -208,7 +209,6 @@ public class Game extends Thread{
 
         if(!validA || !validB){
             status = "finished";
-
             if(!validA && !validB){
                 loser = "all";
             }else if(!validA){
@@ -265,7 +265,7 @@ public class Game extends Thread{
                 loser,
                 new Date()
         );
-
+        updataReting(loser);
         WebSocketServer.recordMapper.insert(record);
     }
 
@@ -275,6 +275,22 @@ public class Game extends Thread{
         resp.put("event", "result");
         resp.put("loser", loser);
         sendAllMessages(resp.toJSONString());
+    }
+
+    private void updataReting(String loser){
+        User userA = WebSocketServer.userMapper.selectById(playerA.getId());
+        User userB = WebSocketServer.userMapper.selectById(playerB.getId());
+        if("a".equals(loser)) {
+            userA.setRating(userA.getRating() - 2);
+            userB.setRating(userB.getRating() + 5);
+        }
+        else if("b".equals(loser)){
+            userA.setRating(userA.getRating() + 5);
+            userB.setRating(userB.getRating() - 2);
+        }
+        System.out.println("updataReting success");
+        WebSocketServer.userMapper.updateById(userA);
+        WebSocketServer.userMapper.updateById(userB);
     }
 
     @Override
